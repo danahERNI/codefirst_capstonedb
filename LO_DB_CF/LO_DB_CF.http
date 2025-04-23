@@ -1,0 +1,6 @@
+@LO_DB_CF_HostAddress = http://localhost:5161
+
+GET {{LO_DB_CF_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
