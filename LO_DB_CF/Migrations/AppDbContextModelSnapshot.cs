@@ -136,6 +136,71 @@ namespace LO_DB_CF.Migrations
                     b.ToTable("Images");
                 });
 
+            modelBuilder.Entity("LO_DB_CF.Entities.MentorAssessment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BootcamperId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("MentorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("OverallRating")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tags")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("TopicId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TopicId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("MentorAssessments");
+                });
+
+            modelBuilder.Entity("LO_DB_CF.Entities.MentorSkillFeedback", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MentorAssessmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("SkillId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MentorAssessmentId");
+
+                    b.HasIndex("SkillId");
+
+                    b.ToTable("MentorSkillFeedbacks");
+                });
+
             modelBuilder.Entity("LO_DB_CF.Entities.Project", b =>
                 {
                     b.Property<Guid>("Id")
@@ -216,9 +281,6 @@ namespace LO_DB_CF.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("SkillId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
@@ -226,11 +288,30 @@ namespace LO_DB_CF.Migrations
 
                     b.HasIndex("BatchId");
 
-                    b.HasIndex("SkillId");
-
                     b.HasIndex("UserId");
 
                     b.ToTable("Topics");
+                });
+
+            modelBuilder.Entity("LO_DB_CF.Entities.TopicSkill", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SkillId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TopicId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SkillId");
+
+                    b.HasIndex("TopicId");
+
+                    b.ToTable("TopicSkills");
                 });
 
             modelBuilder.Entity("LO_DB_CF.Entities.User", b =>
@@ -317,6 +398,44 @@ namespace LO_DB_CF.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("LO_DB_CF.Entities.MentorAssessment", b =>
+                {
+                    b.HasOne("LO_DB_CF.Entities.Topic", "Topic")
+                        .WithMany()
+                        .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LO_DB_CF.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Topic");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LO_DB_CF.Entities.MentorSkillFeedback", b =>
+                {
+                    b.HasOne("LO_DB_CF.Entities.MentorAssessment", "MentorAssessment")
+                        .WithMany()
+                        .HasForeignKey("MentorAssessmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LO_DB_CF.Entities.Skill", "Skill")
+                        .WithMany()
+                        .HasForeignKey("SkillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MentorAssessment");
+
+                    b.Navigation("Skill");
+                });
+
             modelBuilder.Entity("LO_DB_CF.Entities.Project", b =>
                 {
                     b.HasOne("LO_DB_CF.Entities.User", "User")
@@ -347,12 +466,6 @@ namespace LO_DB_CF.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("LO_DB_CF.Entities.Skill", "Skill")
-                        .WithMany()
-                        .HasForeignKey("SkillId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("LO_DB_CF.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -361,9 +474,26 @@ namespace LO_DB_CF.Migrations
 
                     b.Navigation("Batch");
 
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LO_DB_CF.Entities.TopicSkill", b =>
+                {
+                    b.HasOne("LO_DB_CF.Entities.Skill", "Skill")
+                        .WithMany()
+                        .HasForeignKey("SkillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LO_DB_CF.Entities.Topic", "Topic")
+                        .WithMany()
+                        .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Skill");
 
-                    b.Navigation("User");
+                    b.Navigation("Topic");
                 });
 
             modelBuilder.Entity("LO_DB_CF.Entities.User", b =>

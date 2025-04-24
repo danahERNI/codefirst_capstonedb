@@ -8,10 +8,8 @@ namespace LO_DB_CF.Entities
         public string Name { get; set; }
         public Guid BatchId { get; set; }
         public Guid UserId { get; set; } // mentor
-        public Guid SkillId { get; set; }
 
         public Batch Batch { get; set; }
         public User User { get; set; }
-        public Skill Skill { get; set; }
     }
 }

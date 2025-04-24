@@ -21,6 +21,9 @@ namespace LO_DB_CF.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Topic> Topics { get; set; }
         public DbSet<Project> Projects { get; set; }
+        public DbSet<TopicSkill> TopicSkills { get; set; }
+        public DbSet<MentorAssessment> MentorAssessments { get; set; }
+        public DbSet<MentorSkillFeedback> MentorSkillFeedbacks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,12 +37,6 @@ namespace LO_DB_CF.Data
                 .HasOne(t => t.User)
                 .WithMany()
                 .HasForeignKey(t => t.UserId)
-                .OnDelete(DeleteBehavior.Restrict); // or .NoAction()
-
-            modelBuilder.Entity<Topic>()
-                .HasOne(t => t.Skill)
-                .WithMany()
-                .HasForeignKey(t => t.SkillId)
                 .OnDelete(DeleteBehavior.Restrict); // or .NoAction()
         }
     }

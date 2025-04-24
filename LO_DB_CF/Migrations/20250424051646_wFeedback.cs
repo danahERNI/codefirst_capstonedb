@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LO_DB_CF.Migrations
 {
     /// <inheritdoc />
-    public partial class @new : Migration
+    public partial class wFeedback : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -199,8 +199,7 @@ namespace LO_DB_CF.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BatchId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SkillId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -209,12 +208,6 @@ namespace LO_DB_CF.Migrations
                         name: "FK_Topics_Batches_BatchId",
                         column: x => x.BatchId,
                         principalTable: "Batches",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Topics_Skills_SkillId",
-                        column: x => x.SkillId,
-                        principalTable: "Skills",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -251,10 +244,112 @@ namespace LO_DB_CF.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "MentorAssessments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OverallRating = table.Column<int>(type: "int", nullable: false),
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Tags = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MentorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BootcamperId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TopicId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MentorAssessments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MentorAssessments_Topics_TopicId",
+                        column: x => x.TopicId,
+                        principalTable: "Topics",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MentorAssessments_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TopicSkills",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TopicId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SkillId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TopicSkills", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TopicSkills_Skills_SkillId",
+                        column: x => x.SkillId,
+                        principalTable: "Skills",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TopicSkills_Topics_TopicId",
+                        column: x => x.TopicId,
+                        principalTable: "Topics",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MentorSkillFeedbacks",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Rating = table.Column<int>(type: "int", nullable: false),
+                    MentorAssessmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SkillId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MentorSkillFeedbacks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MentorSkillFeedbacks_MentorAssessments_MentorAssessmentId",
+                        column: x => x.MentorAssessmentId,
+                        principalTable: "MentorAssessments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MentorSkillFeedbacks_Skills_SkillId",
+                        column: x => x.SkillId,
+                        principalTable: "Skills",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Certifications_UserId",
                 table: "Certifications",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MentorAssessments_TopicId",
+                table: "MentorAssessments",
+                column: "TopicId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MentorAssessments_UserId",
+                table: "MentorAssessments",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MentorSkillFeedbacks_MentorAssessmentId",
+                table: "MentorSkillFeedbacks",
+                column: "MentorAssessmentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MentorSkillFeedbacks_SkillId",
+                table: "MentorSkillFeedbacks",
+                column: "SkillId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Projects_UserId",
@@ -272,14 +367,19 @@ namespace LO_DB_CF.Migrations
                 column: "BatchId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Topics_SkillId",
-                table: "Topics",
-                column: "SkillId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Topics_UserId",
                 table: "Topics",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TopicSkills_SkillId",
+                table: "TopicSkills",
+                column: "SkillId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TopicSkills_TopicId",
+                table: "TopicSkills",
+                column: "TopicId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_BatchId",
@@ -322,22 +422,31 @@ namespace LO_DB_CF.Migrations
                 name: "Certifications");
 
             migrationBuilder.DropTable(
+                name: "MentorSkillFeedbacks");
+
+            migrationBuilder.DropTable(
                 name: "Projects");
 
             migrationBuilder.DropTable(
-                name: "Topics");
+                name: "TopicSkills");
 
             migrationBuilder.DropTable(
                 name: "UserSkills");
 
             migrationBuilder.DropTable(
+                name: "MentorAssessments");
+
+            migrationBuilder.DropTable(
                 name: "Skills");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Topics");
 
             migrationBuilder.DropTable(
                 name: "Categories");
+
+            migrationBuilder.DropTable(
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Batches");
